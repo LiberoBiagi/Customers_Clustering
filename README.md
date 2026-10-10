@@ -13,12 +13,16 @@ AIAI's current three-tier loyalty program (Aurora, Nova, Star) does not reflect 
 
 This project builds a **data-driven, multi-perspective customer segmentation** and uses it to propose a new loyalty program.
 
-**Key findings from the EDA**
+The work is documented in two reports:
+- **Report 1** ([`docs/DM_report 2.pdf`](docs/DM_report%202.pdf)): data cleaning, feature engineering, external data integration and EDA.
+- **Report 2** ([`docs/DM_report.pdf`](docs/DM_report.pdf)): clustering, fuzzy validation, final segments and loyalty strategy.
+
+**Key findings from the EDA (Report 1)**
 - Loyalty tiers show no behavioural differentiation.
 - Program membership grew steadily, but Customer Lifetime Value (CLV) stagnated.
 - Three hub cities (Toronto, Vancouver, Montreal) account for ~47% of flights.
 
-**Result:** 4 customer segments and a 3-tier loyalty program (*Current < Crest < Deep Blue*).
+**Result (Report 2):** 4 customer segments and a 3-tier loyalty program (*Current < Crest < Deep Blue*).
 
 ## 🗂️ Data
 
@@ -27,7 +31,7 @@ This project builds a **data-driven, multi-perspective customer segmentation** a
 | `CustomerDB` | 16,921 customers, 20 columns (demographics, income, loyalty status, CLV, enrolment/cancellation) |
 | `FlightsDB` | 608,436 rows, monthly flight activity per customer (Jan 2019 – Dec 2021): flights, companions, distance, points earned/redeemed |
 
-The two tables are joined on `Loyalty#`. The cleaned and feature-engineered table is provided in [`customer_data`](customer_data).
+The two tables are joined on `Loyalty#`. The cleaned and feature-engineered table is provided in [`customer_data`](customer_data). Column descriptions are in `Data/DM_AIAI_Metadata.csv`.
 
 **Cleaning:** duplicate IDs removed (327), 2019 flight counts normalised (multiples of 0.9), impossible distances (> 13,230 km average) and negative subscription durations dropped.
 
@@ -58,15 +62,17 @@ K-Means, DBSCAN and Self-Organizing Maps were compared for each perspective. DBS
 
 ## 👥 Final segments & loyalty program
 
-| Segment | Profile | Program |
-|---|---|---|
-| Regular Subscribers ("Mom & Pop Fliers") | long-standing, low value | **Current** |
-| Loyal, Long-Time Spenders | long-standing, high CLV | **Deep Blue** |
-| Enthusiastic New Spenders | new, fly often | **Crest** / **Current** |
-| New High Spenders | new, high spend per flight | **Crest** |
+Full description in Report 2 ([`docs/DM_report.pdf`](docs/DM_report.pdf)).
 
-- **Current** – maintain loyalty and grow spend (comfort purchases, upgrades, lounge access)
-- **Crest** – build loyalty in infrequent but high-spending customers (bundle deals, early-booking points)
+| Segment | Profile | Loyalty program |
+|---|---|---|
+| Regular Subscribers ("Mom & Pop Fliers") | loyal, low spending | **Current** |
+| Loyal, Long-Time Spenders ("Die-Hard Fans") | long-time customers, high CLV | **Current** (in part) / **Deep Blue** |
+| Enthusiastic Spenders ("New Business Bros") | high spend per flight, low loyalty | **Crest** |
+| New High Spenders | new, high spending, high attachment | **Deep Blue** |
+
+- **Current** – maintain loyalty and grow spend (comfort purchases, seat upgrades, lounge access)
+- **Crest** – build loyalty in customers who fly rarely but spend a lot (bundle deals, points for early bookings)
 - **Deep Blue** – premium tier (exclusive events, higher points multipliers)
 
 Rollout in 3 phases: migrate existing customers → prepare campaigns → launch.
@@ -97,18 +103,20 @@ python dashboard_v2.py
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-├── customer_data              # cleaned customer-level dataset (used by dashboard.py)
+├── customer_data                  # cleaned customer-level dataset (used by dashboard.py)
 ├── Data/
-│   └── clustered_df.csv       # clustering output (used by dashboard_v2.py)
-├── data_mining.ipynb          # full pipeline: cleaning → clustering → fuzzy → dashboard
-├── poster_viz.ipynb           # figures for the poster + extra analysis
-├── dashboard.py               # Streamlit EDA dashboard
-├── dashboard_v2.py            # Dash cluster dashboard
+│   ├── DM_AIAI_CustomerDB.csv     # raw customer data
+│   ├── DM_AIAI_FlightsDB.csv      # raw monthly flight data
+│   ├── DM_AIAI_Metadata.csv       # column descriptions
+│   └── clustered_df.csv           # clustering output (used by dashboard_v2.py)
+├── data_mining.ipynb              # full pipeline: cleaning → clustering → fuzzy → dashboard
+├── poster_viz.ipynb               # figures for the poster + extra analysis
+├── dashboard.py                   # Streamlit EDA dashboard
+├── dashboard_v2.py                # Dash cluster dashboard
 └── docs/
-    ├── report_1_eda.pdf       # Report 1: EDA and feature engineering
-    ├── report_2_clustering.pdf# Report 2: clustering and loyalty strategy
-    ├── Poster_v1.pdf
-    └── Poster_v1.pptx
+    ├── DM_report 2.pdf            # Report 1: data cleaning, feature engineering, EDA
+    ├── DM_report.pdf              # Report 2: clustering, segments and loyalty strategy
+    └── Poster_v1.pdf
 ```
 
 ## ▶️ Reproducing the analysis
